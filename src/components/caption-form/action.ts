@@ -1,13 +1,11 @@
 'use server';
 
-// import { prisma } from "@/server/db";
 import { Ratelimit } from '@upstash/ratelimit';
 import { kv } from '@vercel/kv';
+import { sql } from '@vercel/postgres';
 import { jwtVerify } from 'jose';
-// import { redirect } from 'next/navigation';
+import OpenAI from 'openai';
 import { z } from 'zod';
-
-// import { replicate } from '@/server/replicate';
 
 const jwtSchema = z.object({
   ip: z.string(),
@@ -18,21 +16,26 @@ const ratelimit = {
     redis: kv,
     limiter: Ratelimit.slidingWindow(500, '1 d'),
   }),
-  //   ios: new Ratelimit({
-  //     redis: kv,
-  //     limiter: Ratelimit.slidingWindow(3, "7 d"),
-  //     prefix: "ratelimit:ios",
-  //   }),
 };
 
-interface IFormState {
-  message: string;
-}
+type TSuccess = {
+  status: 'success';
+  choices: OpenAI.Chat.Completions.ChatCompletion['choices'];
+};
 
+type TError = {
+  status: 'error';
+  errorMessage: string;
+};
+
+type TFormState = TSuccess | TError | void;
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 export async function createCaption(
-  prevFormState: IFormState | undefined,
+  prevFormState: TFormState | undefined,
   formData: FormData,
-): Promise<IFormState | void> {
+): Promise<TFormState> {
   const prompt = (formData.get('prompt') as string | null)
     ?.trim()
     .replaceAll(':', '');
@@ -50,18 +53,40 @@ export async function createCaption(
     const { remaining } = await ratelimit.free.limit(ip);
     if (remaining <= 0)
       return {
-        message:
+        status: 'error',
+        errorMessage:
           'Free limit reached, download mobile app for unlimited access.',
       };
 
-    const data = { prompt };
-
-    await Promise.all([
-      prisma.emoji.create({ data }),
-      replicate.createEmoji(data),
+    const [, aiResponse] = await Promise.all([
+      sql`INSERT INTO Prompts (Prompt) VALUES (${prompt});`,
+      openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        stream: false,
+        messages: [{ role: 'user', content: prompt }],
+      }),
     ]);
-  } catch (error) {
+    return {
+      status: 'success',
+      choices: aiResponse.choices,
+    };
+    // Convert the response into a friendly text-stream
+    // const stream = OpenAIStream(aiResponse);
+    // console.log({ stream });
+    // return { message: new StreamingTextResponse(stream) };
+    // return { message: stream };
+    // // Respond with the stream
+    // return new StreamingTextResponse(stream);
+  } catch (error: any) {
     console.error(error);
-    return { message: 'Connection error, please refresh the page.' };
+
+    if (error.status === 429) {
+      return { errorMessage: 'RateLimitError', status: 'error' };
+    }
+
+    return {
+      errorMessage: 'Connection error, please refresh the page.',
+      status: 'error',
+    };
   }
 }
