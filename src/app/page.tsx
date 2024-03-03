@@ -1,4 +1,4 @@
-// import CaptionForm from '@/components/caption-form';
+import CaptionForm from '@/components/caption-form';
 import { Badge } from '@/components/ui/badge';
 import {
   Drawer,
@@ -30,11 +30,10 @@ export default async function Home() {
       <p className="text-gray-500 text-center mb-12 text-base animate-in fade-in slide-in-from-bottom-4 duration-1200 ease-in-out">
         {numberOfCaptions} generated and counting!
       </p>
-      {token}
 
       <div className="max-w-md space-y-4 w-full animate-in fade-in slide-in-from-bottom-4 duration-1200 ease-in-out">
         <div>
-          {/* <CaptionForm token={token} /> */}
+          <CaptionForm token={token} />
           <div className="flex space-x-2">
             <Badge variant="outline">Badgex</Badge>
             <Badge variant="outline">Badge</Badge>
