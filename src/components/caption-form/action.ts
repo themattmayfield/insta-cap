@@ -41,7 +41,7 @@ export async function createCaption(
     .replaceAll(':', '');
   const token = formData.get('token') as string | null;
 
-  if (!prompt) return; // no need to display an error message for blank prompts
+  if (!prompt) return;
 
   try {
     const verified = await jwtVerify(
@@ -64,19 +64,18 @@ export async function createCaption(
         model: 'gpt-3.5-turbo',
         stream: false,
         messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        max_tokens: 200,
+        n: 1,
       }),
     ]);
     return {
       status: 'success',
       choices: aiResponse.choices,
     };
-    // Convert the response into a friendly text-stream
-    // const stream = OpenAIStream(aiResponse);
-    // console.log({ stream });
-    // return { message: new StreamingTextResponse(stream) };
-    // return { message: stream };
-    // // Respond with the stream
-    // return new StreamingTextResponse(stream);
   } catch (error: any) {
     console.error(error);
 

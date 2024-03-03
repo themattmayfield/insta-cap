@@ -62,7 +62,9 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
         <Badge variant="outline">Badge</Badge>
       </div>
       {formState?.status === 'success' && (
-        <AiResponse choices={formState.choices} />
+        <AiResponse
+          choices={formState.choices[0].message.content?.split('\n')}
+        />
       )}
     </>
   );

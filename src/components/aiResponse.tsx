@@ -1,21 +1,13 @@
 import React from 'react';
 
-import type OpenAI from 'openai';
-
-const AiResponse = ({
-  choices,
-}: {
-  choices: OpenAI.Chat.Completions.ChatCompletion['choices'];
-}) => {
+const AiResponse = ({ choices }: { choices: string[] | undefined }) => {
   return (
     <div className="space-y-8 flex flex-col items-center justify-center">
-      {choices.map(({ message, index }) => {
-        const content = message.content;
-
+      {choices?.map((content, index) => {
         return (
           <div
             key={index}
-            className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
+            className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border w-full"
           >
             {content}
           </div>
