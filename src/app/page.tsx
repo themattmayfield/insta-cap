@@ -1,14 +1,4 @@
 import CaptionForm from '@/components/caption-form';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
 import { sql } from '@vercel/postgres';
 import pluralize from 'pluralize';
 
@@ -34,51 +24,7 @@ export default async function Home() {
         <div>
           <CaptionForm token={token} />
         </div>
-        <div>
-          <Drawer>
-            <DrawerTrigger>
-              <p className="flex items-center space-x-2 text-sm animate-bounce hover:underline">
-                <span>additional customization</span>
-                <OptionIcon className="h-4 w-4" />
-              </p>
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                <DrawerDescription>
-                  This action cannot be undone.
-                </DrawerDescription>
-              </DrawerHeader>
-              <DrawerFooter>
-                <button>Submit</button>
-                <DrawerClose>
-                  <button>Cancel</button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-        </div>
       </div>
     </div>
-  );
-}
-
-function OptionIcon(props: { className: string }) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 3h6l6 18h6" />
-      <path d="M14 3h7" />
-    </svg>
   );
 }
