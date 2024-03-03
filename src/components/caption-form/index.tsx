@@ -2,9 +2,12 @@
 import { useEffect, useRef } from 'react';
 import { useFormState } from 'react-dom';
 
+import { Badge } from '@/components/ui/badge';
+
+import AiResponse from '../aiResponse';
+
 import { createCaption } from './action';
 import { SubmitButton } from './SubmitButton';
-
 type TCaptionFormProps = {
   initialPrompt?: string;
   token: string | undefined;
@@ -40,7 +43,7 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
               submitRef.current?.click();
             }
           }}
-          placeholder="cat"
+          placeholder="idk, enter something.."
           className="bg-transparent text-white placeholder:text-gray-400 ring-0 outline-none resize-none py-2.5 px-2 font-mono text-sm h-10 w-full transition-all duration-300"
         />
         <input
@@ -51,10 +54,15 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
           className="hidden"
           readOnly
         />
+
         <SubmitButton ref={submitRef} />
       </form>
+      <div className="flex space-x-2 mb-6">
+        <Badge variant="outline">Badgex</Badge>
+        <Badge variant="outline">Badge</Badge>
+      </div>
       {formState?.status === 'success' && (
-        <div>{JSON.stringify(formState.choices)}</div>
+        <AiResponse choices={formState.choices} />
       )}
     </>
   );
