@@ -41,6 +41,7 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
             if (e.key === 'Enter') {
               e.preventDefault();
               submitRef.current?.click();
+              e.currentTarget.blur();
             }
           }}
           placeholder="idk, enter something.."
