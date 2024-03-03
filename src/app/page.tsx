@@ -35,7 +35,7 @@ export default async function Home() {
         <div>
           <CaptionForm token={token} />
           <div className="flex space-x-2">
-            <Badge variant="outline">Badge</Badge>
+            <Badge variant="outline">Badgex</Badge>
             <Badge variant="outline">Badge</Badge>
           </div>
         </div>
