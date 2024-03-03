@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
@@ -33,6 +34,7 @@ export default function RootLayout({
         <main className="container h-screen flex items-stretch flex-col">
           {children}
         </main>
+        <Toaster />
       </body>
     </html>
   );

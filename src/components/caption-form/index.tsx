@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useFormState } from 'react-dom';
 
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 import AiResponse from '../aiResponse';
 
@@ -22,10 +23,9 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
       formRef.current?.reset();
     }
   }, [formState]);
-  // useEffect(() => {
-  //   if (!formState) return;
-  //   // toast.error(formState.message)
-  // }, [formState]);
+  useEffect(() => {
+    if (formState?.status === 'error') toast.error(formState.errorMessage);
+  }, [formState]);
 
   return (
     <>
