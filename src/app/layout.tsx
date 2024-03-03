@@ -25,7 +25,6 @@ export default function RootLayout({
       >
         <Header />
         <main className="container h-screen flex items-stretch flex-col">
-          {' '}
           {children}
         </main>
       </body>

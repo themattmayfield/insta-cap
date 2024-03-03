@@ -10,9 +10,17 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
+import { sql } from '@vercel/postgres';
+import pluralize from 'pluralize';
 
 export default async function Home() {
-  const tokenResponse = await fetch(`${process.env.WEB_URL}/api/token`);
+  const [tokenResponse, { rows }] = await Promise.all([
+    fetch(`${process.env.WEB_URL}/api/token`),
+    sql`SELECT COUNT(*) FROM Prompts;`,
+  ]);
+  const count = rows[0].count;
+  const numberOfCaptions = pluralize('captions', count, true);
+
   const { token } = await tokenResponse.json();
   return (
     <div className="py-[15vh] sm:py-[20vh] flex flex-col items-center justify-center">
@@ -20,7 +28,7 @@ export default async function Home() {
         Insta captions
       </h1>
       <p className="text-gray-500 text-center mb-12 text-base animate-in fade-in slide-in-from-bottom-4 duration-1200 ease-in-out">
-        12 captions generated and counting!
+        {numberOfCaptions} generated and counting!
       </p>
 
       <div className="max-w-md space-y-4 w-full animate-in fade-in slide-in-from-bottom-4 duration-1200 ease-in-out">
