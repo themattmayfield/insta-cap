@@ -2,6 +2,8 @@ import CaptionForm from '@/components/caption-form';
 import { sql } from '@vercel/postgres';
 import pluralize from 'pluralize';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const [tokenResponse, { rows }] = await Promise.all([
     fetch(`${process.env.WEB_URL}/api/token`),

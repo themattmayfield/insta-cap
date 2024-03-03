@@ -4,6 +4,7 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { kv } from '@vercel/kv';
 import { sql } from '@vercel/postgres';
 import { jwtVerify } from 'jose';
+import { revalidatePath } from 'next/cache';
 import OpenAI from 'openai';
 import { z } from 'zod';
 
@@ -72,6 +73,8 @@ export async function createCaption(
         n: 1,
       }),
     ]);
+    revalidatePath('/');
+
     return {
       status: 'success',
       choices: aiResponse.choices,
