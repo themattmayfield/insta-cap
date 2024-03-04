@@ -3,7 +3,6 @@ import { kv } from '@vercel/kv';
 import { sql } from '@vercel/postgres';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { jwtVerify } from 'jose';
-import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
@@ -61,7 +60,8 @@ export async function POST(request: Request) {
 
     // Convert the response into a friendly text-stream
     const stream = OpenAIStream(aiResponse);
-    revalidatePath('/');
+
+    return Response.json({ revalidated: true, now: Date.now() });
 
     // Respond with the stream
     return new StreamingTextResponse(stream);

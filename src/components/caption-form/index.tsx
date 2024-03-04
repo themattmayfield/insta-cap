@@ -13,11 +13,11 @@ import MoreSettings from '../MoreSettings';
 
 import { SubmitButton } from './SubmitButton';
 type TCaptionFormProps = {
-  initialPrompt?: string;
   token: string | undefined;
+  revalidate: () => Promise<void>;
 };
 
-const CaptionForm = ({ token }: TCaptionFormProps) => {
+const CaptionForm = ({ token, revalidate }: TCaptionFormProps) => {
   const searchParams = useSearchParams();
   const tone = searchParams.get('tone');
 
@@ -38,6 +38,7 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
     onError: () => {
       setInput(input);
     },
+    onFinish: async () => await revalidate(),
   });
 
   useEffect(() => {
