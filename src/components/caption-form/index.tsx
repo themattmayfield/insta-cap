@@ -36,7 +36,7 @@ const CaptionForm = ({
     error,
     setInput,
   } = useChat({
-    api: 'http://localhost:3000/api/add-prompt',
+    api: 'api/add-prompt',
     body: { token, tone },
     onError: () => {
       setInput(input);
