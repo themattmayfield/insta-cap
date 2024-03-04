@@ -34,6 +34,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 export async function createCaption(
+  tone: string | null,
   prevFormState: TFormState | undefined,
   formData: FormData,
 ): Promise<TFormState> {
@@ -43,6 +44,8 @@ export async function createCaption(
   const token = formData.get('token') as string | null;
 
   if (!prompt) return;
+
+  const lePrompt = `Generate 3 ${tone} instagram captions clearly labeled "1.", "2.", and "3.". Only return these 3 instagram captionsy, nothing else. Make sure each generated caption is less than 300 characters, has short sentences that are found in instagram bios, and feel free to use this context as well: ${prompt}`;
 
   try {
     const verified = await jwtVerify(
@@ -64,7 +67,7 @@ export async function createCaption(
       openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         stream: false,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: lePrompt }],
         temperature: 0.7,
         top_p: 1,
         frequency_penalty: 0,

@@ -2,7 +2,6 @@
 import { useEffect, useRef } from 'react';
 import { useFormState } from 'react-dom';
 
-import { Badge } from '@/components/ui/badge';
 import { TONES } from '@/constants';
 import { createUrl } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
@@ -21,13 +20,15 @@ type TCaptionFormProps = {
 
 const CaptionForm = ({ token }: TCaptionFormProps) => {
   const searchParams = useSearchParams();
+  const tone = searchParams.get('tone');
 
-  const [formState, formAction] = useFormState(createCaption, undefined);
+  const formActionWithTone = createCaption.bind(null, tone);
+
+  const [formState, formAction] = useFormState(formActionWithTone, undefined);
   const submitRef = useRef<React.ElementRef<'button'>>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const { push } = useRouter();
 
-  const tone = searchParams.get('tone');
   useEffect(() => {
     if (formState?.status === 'success') {
       formRef.current?.reset();
@@ -43,6 +44,7 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
       push(createUrl('/', newParams));
     }
   }, [push, searchParams, tone]);
+
   return (
     <>
       <form
@@ -74,13 +76,10 @@ const CaptionForm = ({ token }: TCaptionFormProps) => {
 
         <SubmitButton ref={submitRef} />
       </form>
-      <div className="flex space-x-2 mb-6">
-        <MoreSettings searchParams={searchParams} />
-        <Badge variant="outline">{tone}</Badge>
-      </div>
+      <MoreSettings searchParams={searchParams} />
       {formState?.status === 'success' && (
         <AiResponse
-          choices={formState.choices[0].message.content?.split('\n')}
+          choices={formState.choices[0].message.content?.split('\n\n')}
         />
       )}
     </>

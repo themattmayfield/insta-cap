@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import {
   Drawer,
   DrawerContent,
@@ -28,53 +29,56 @@ const MoreSettings = ({
   const tone = searchParams.get('tone');
   const { push } = useRouter();
   return (
-    <Drawer>
-      <DrawerTrigger>
-        <CogIcon className="animate-[spin_2s_linear_infinite]	w-6 h-6" />
-        <span className="sr-only">Cog icon</span>
-      </DrawerTrigger>
-      <DrawerContent className="container max-w-2xl">
-        <DrawerHeader className="sm:text-center mb-6">
-          <DrawerTitle>dial in your caption</DrawerTitle>
-          <DrawerDescription>side note...buy me a coffee</DrawerDescription>
-        </DrawerHeader>
-        <div className="grid grid-cols-3 items-center mb-4">
-          <Label className="mb-1" htmlFor="tone">
-            select a tone
-          </Label>
-          <Select
-            name="tone"
-            onValueChange={(e) => {
-              const newParams = new URLSearchParams(searchParams.toString());
-              newParams.set('tone', e);
-              push(createUrl('/', newParams));
-            }}
-            defaultValue={tone || 'funny'}
-          >
-            <SelectTrigger className="col-span-2">
-              <SelectValue placeholder="Theme" />
-            </SelectTrigger>
-            <SelectContent>
-              {TONES.map((tone, index) => (
-                <SelectItem key={index} value={tone}>
-                  {tone}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <DrawerFooter>
-          <div className="flex items-center justify-center space-x-4 animate-bounce">
-            <Link href={'https://github.com/themattmayfield/insta-cap'}>
-              <GithubIcon className="w-6 h-6" />
-            </Link>
-            <Link href={'https://www.instagram.com/themattmayfield/'}>
-              <InstagramIcon className="w-6 h-6" />
-            </Link>
+    <div className="flex space-x-2 mb-6">
+      <Drawer>
+        <DrawerTrigger>
+          <CogIcon className="animate-[spin_2s_linear_infinite]	w-6 h-6" />
+          <span className="sr-only">Cog icon</span>
+        </DrawerTrigger>
+        <DrawerContent className="container max-w-2xl">
+          <DrawerHeader className="sm:text-center mb-6">
+            <DrawerTitle>dial in your caption</DrawerTitle>
+            <DrawerDescription>side note...buy me a coffee</DrawerDescription>
+          </DrawerHeader>
+          <div className="grid grid-cols-3 items-center mb-4">
+            <Label className="mb-1" htmlFor="tone">
+              select a tone
+            </Label>
+            <Select
+              name="tone"
+              onValueChange={(e) => {
+                const newParams = new URLSearchParams(searchParams.toString());
+                newParams.set('tone', e);
+                push(createUrl('/', newParams));
+              }}
+              defaultValue={tone || 'funny'}
+            >
+              <SelectTrigger className="col-span-2">
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                {TONES.map((tone, index) => (
+                  <SelectItem key={index} value={tone}>
+                    {tone}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          <DrawerFooter>
+            <div className="flex items-center justify-center space-x-4 animate-bounce">
+              <Link href={'https://github.com/themattmayfield/insta-cap'}>
+                <GithubIcon className="w-6 h-6" />
+              </Link>
+              <Link href={'https://www.instagram.com/themattmayfield/'}>
+                <InstagramIcon className="w-6 h-6" />
+              </Link>
+            </div>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+      <Badge variant="outline">{tone}</Badge>
+    </div>
   );
 };
 
