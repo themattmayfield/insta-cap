@@ -19,14 +19,14 @@ import {
 import { TONES } from '@/constants';
 import { createUrl } from '@/lib/utils';
 import Link from 'next/link';
-import { useRouter, type ReadonlyURLSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const MoreSettings = ({
   searchParams,
 }: {
-  searchParams: ReadonlyURLSearchParams;
+  searchParams: Record<string, string | undefined>;
 }) => {
-  const tone = searchParams.get('tone');
+  const tone = searchParams.tone;
   const { push } = useRouter();
   return (
     <div className="flex space-x-2 mb-6">
@@ -47,7 +47,7 @@ const MoreSettings = ({
             <Select
               name="tone"
               onValueChange={(e) => {
-                const newParams = new URLSearchParams(searchParams.toString());
+                const newParams = new URLSearchParams();
                 newParams.set('tone', e);
                 push(createUrl('/', newParams));
               }}

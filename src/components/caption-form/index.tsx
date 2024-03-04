@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import { TONES } from '@/constants';
 import { createUrl } from '@/lib/utils';
 import { useChat } from 'ai/react';
-import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -15,11 +14,15 @@ import { SubmitButton } from './SubmitButton';
 type TCaptionFormProps = {
   token: string | undefined;
   revalidate: () => Promise<void>;
+  searchParams: Record<string, string | undefined>;
 };
 
-const CaptionForm = ({ token, revalidate }: TCaptionFormProps) => {
-  const searchParams = useSearchParams();
-  const tone = searchParams.get('tone');
+const CaptionForm = ({
+  token,
+  revalidate,
+  searchParams,
+}: TCaptionFormProps) => {
+  const tone = searchParams.tone as string;
 
   const submitRef = useRef<React.ElementRef<'button'>>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -46,7 +49,7 @@ const CaptionForm = ({ token, revalidate }: TCaptionFormProps) => {
   }, [error]);
   useEffect(() => {
     if (!tone || !TONES.includes(tone)) {
-      const newParams = new URLSearchParams(searchParams.toString());
+      const newParams = new URLSearchParams();
       newParams.set('tone', 'humerous');
       push(createUrl('/', newParams));
     }
