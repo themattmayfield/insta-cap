@@ -61,8 +61,6 @@ export async function POST(request: Request) {
     // Convert the response into a friendly text-stream
     const stream = OpenAIStream(aiResponse);
 
-    return Response.json({ revalidated: true, now: Date.now() });
-
     // Respond with the stream
     return new StreamingTextResponse(stream);
   } catch (error: any) {
