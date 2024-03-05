@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -47,10 +48,10 @@ const Header = () => (
         <CircleIcon className="h-6 w-6" />
         <span className="font-bold">insta/ai</span>
       </div>
-      <button>
+      <Link target="_blank" href="https://ko-fi.com/themattmayfield">
         <CoffeeIcon className="h-6 w-6" />
         <span className="sr-only">Coffe icon</span>
-      </button>
+      </Link>
     </div>
   </header>
 );
