@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     const [, aiResponse] = await Promise.all([
       sql`SELECT * FROM Prompts;`,
       openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4-0125-preview',
         stream: true,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
