@@ -148,7 +148,7 @@ const HashtagCountSlider = ({ tone, length, hashtag }: TSettings) => {
   return (
     <div className="grid grid-cols-3 items-center mb-4">
       <Label className="mb-1" htmlFor="tone">
-        number of hastags
+        number of hashtags
       </Label>
       <Slider
         onValueChange={([val]) => {
@@ -157,8 +157,8 @@ const HashtagCountSlider = ({ tone, length, hashtag }: TSettings) => {
           push(createUrl('/', newParams));
         }}
         className="col-span-2"
-        defaultValue={[0]}
-        max={HASHTAGS.length}
+        defaultValue={[Number(hashtag)]}
+        max={HASHTAGS.length - 1}
         step={1}
       />
     </div>

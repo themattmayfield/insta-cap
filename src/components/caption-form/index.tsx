@@ -19,17 +19,17 @@ type TCaptionFormProps = {
 const getTone = (
   searchParams: Record<string, string | undefined>,
 ): { tone: TTones; length: TLengths; hashtag: THashtags } => {
-  const { tone, length, hashtags } = searchParams;
+  const { tone, length, hashtag } = searchParams;
   let newTone = tone as TTones;
   let newLength = length as TLengths;
-  let newHashtag = hashtags as THashtags;
+  let newHashtag = hashtag as THashtags;
   if (!tone || !TONES.includes(tone as TTones)) {
     newTone = 'humerous';
   }
   if (!length || !LENGTHS.includes(length as TLengths)) {
     newLength = 'short';
   }
-  if (!hashtags || !HASHTAGS.includes(hashtags as THashtags)) {
+  if (!hashtag || !HASHTAGS.includes(hashtag as THashtags)) {
     newHashtag = '0';
   }
   return { tone: newTone, length: newLength, hashtag: newHashtag };
