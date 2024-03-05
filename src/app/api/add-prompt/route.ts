@@ -10,6 +10,8 @@ import { z } from 'zod';
 
 export const runtime = 'edge';
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
@@ -21,7 +23,7 @@ const jwtSchema = z.object({
 const ratelimit = {
   free: new Ratelimit({
     redis: kv,
-    limiter: Ratelimit.slidingWindow(500, '1 d'),
+    limiter: Ratelimit.slidingWindow(isDevelopment ? 500 : 20, '1 d'),
   }),
 };
 const EMPTY_PROMPT_TEXT = 'empty_prompt';
@@ -40,17 +42,19 @@ export async function POST(request: Request) {
     if (remaining <= 0) throw new Error(LIMIT_REACHED_TEXT);
 
     const originalPrompt = messages[0].content;
-    const prompt = `Generate 3 ${tone} instagram captions clearly labeled "1.", "2.", and "3.". Do not number them. Only return these 3 instagram captions, nothing else. Make sure there are no quotation marks for each caption. Make sure each generated caption is ${
+    const toneText = `Generate 3 ${tone}`;
+    const lengthText = `${
       length === 'short'
         ? 'less than 300'
         : tone === 'medium'
         ? 'more than 400 characters less than 600'
         : 'more than 700 characters less than 1000'
-    } characters, has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}. There should only be ${pluralize(
-      'hastag',
-      Number(hashtag),
-      true,
-    )}`;
+    }`;
+    const prompt = `${toneText} instagram captions clearly labeled "1.", "2.", and "3.". 
+    Only return these 3 instagram captions, nothing else. Make sure there are no quotation 
+    marks for each caption. Make sure each generated caption is ${lengthText} characters, 
+    has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}. 
+    There should be exactly ${pluralize('hashtag', Number(hashtag), true)}`;
 
     await sql`INSERT INTO Prompts (Prompt) VALUES (${originalPrompt});`;
 

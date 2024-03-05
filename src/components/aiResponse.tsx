@@ -1,6 +1,5 @@
-import React from 'react';
-
 import type { Message } from 'ai/react';
+import { toast } from 'sonner';
 
 const AiResponse = ({ messages }: { messages: Message[] }) => {
   return (
@@ -15,6 +14,13 @@ const AiResponse = ({ messages }: { messages: Message[] }) => {
             if (text.replace('\n', '').trim() === '') return;
             return (
               <div
+                onClick={() => {
+                  navigator.clipboard.writeText(text);
+                  toast('Bio copied to clipboard', {
+                    icon: '✂️',
+                    position: 'top-center',
+                  });
+                }}
                 key={index}
                 className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border w-full"
               >
