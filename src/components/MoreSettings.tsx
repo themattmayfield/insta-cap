@@ -16,15 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { TLengths, TTones } from '@/constants';
-import { LENGTHS, TONES } from '@/constants';
+import type { THashtags, TLengths, TTones } from '@/constants';
+import { HASHTAGS, LENGTHS, TONES } from '@/constants';
 import { createUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import pluralize from 'pluralize';
 
-type TSettings = { tone: TTones; length: TLengths };
+type TSettings = { tone: TTones; length: TLengths; hashtag: THashtags };
 
-const MoreSettings = ({ tone, length }: TSettings) => {
+const MoreSettings = ({ tone, length, hashtag }: TSettings) => {
   return (
     <div className="flex space-x-2 mb-6">
       <Drawer>
@@ -37,8 +38,9 @@ const MoreSettings = ({ tone, length }: TSettings) => {
             <DrawerTitle>dial in your caption</DrawerTitle>
             <DrawerDescription>side note...buy me a coffee</DrawerDescription>
           </DrawerHeader>
-          <ToneSelect length={length} tone={tone} />
-          <LengthSelect length={length} tone={tone} />
+          <ToneSelect length={length} tone={tone} hashtag={hashtag} />
+          <LengthSelect length={length} tone={tone} hashtag={hashtag} />
+          <HashtagCountInput length={length} tone={tone} hashtag={hashtag} />
           <DrawerFooter>
             <div className="flex items-center justify-center space-x-4 animate-bounce">
               <Link href={'https://github.com/themattmayfield/insta-cap'}>
@@ -53,13 +55,18 @@ const MoreSettings = ({ tone, length }: TSettings) => {
       </Drawer>
       <Badge variant="outline">{tone}</Badge>
       <Badge variant="outline">{length}</Badge>
+      <Badge variant="outline">
+        {hashtag === '0'
+          ? 'no hashtags'
+          : pluralize('hashtags', Number(hashtag), true)}
+      </Badge>
     </div>
   );
 };
 
 export default MoreSettings;
 
-const ToneSelect = ({ tone, length }: TSettings) => {
+const ToneSelect = ({ tone, length, hashtag }: TSettings) => {
   const { push } = useRouter();
 
   return (
@@ -70,7 +77,7 @@ const ToneSelect = ({ tone, length }: TSettings) => {
       <Select
         name="tone"
         onValueChange={(e) => {
-          const newParams = new URLSearchParams({ tone, length });
+          const newParams = new URLSearchParams({ tone, length, hashtag });
           newParams.set('tone', e);
           push(createUrl('/', newParams));
         }}
@@ -90,7 +97,7 @@ const ToneSelect = ({ tone, length }: TSettings) => {
     </div>
   );
 };
-const LengthSelect = ({ length, tone }: TSettings) => {
+const LengthSelect = ({ length, tone, hashtag }: TSettings) => {
   const { push } = useRouter();
 
   return (
@@ -101,7 +108,7 @@ const LengthSelect = ({ length, tone }: TSettings) => {
       <Select
         name="tone"
         onValueChange={(e) => {
-          const newParams = new URLSearchParams({ tone, length });
+          const newParams = new URLSearchParams({ tone, length, hashtag });
           newParams.set('length', e);
           push(createUrl('/', newParams));
         }}
@@ -114,6 +121,38 @@ const LengthSelect = ({ length, tone }: TSettings) => {
           {LENGTHS.map((length, index) => (
             <SelectItem key={index} value={length}>
               {length}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+
+const HashtagCountInput = ({ tone, length, hashtag }: TSettings) => {
+  const { push } = useRouter();
+
+  return (
+    <div className="grid grid-cols-3 items-center mb-4">
+      <Label className="mb-1" htmlFor="tone">
+        select amount of hastags
+      </Label>
+      <Select
+        name="hashtags"
+        onValueChange={(e) => {
+          const newParams = new URLSearchParams({ tone, length });
+          newParams.set('hashtags', e);
+          push(createUrl('/', newParams));
+        }}
+        defaultValue={hashtag || '0'}
+      >
+        <SelectTrigger className="col-span-2">
+          <SelectValue placeholder="Theme" />
+        </SelectTrigger>
+        <SelectContent>
+          {HASHTAGS.map((hashtag, index) => (
+            <SelectItem key={index} value={hashtag}>
+              {hashtag}
             </SelectItem>
           ))}
         </SelectContent>

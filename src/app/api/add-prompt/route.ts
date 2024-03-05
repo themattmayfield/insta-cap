@@ -5,6 +5,7 @@ import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import pluralize from 'pluralize';
 import { z } from 'zod';
 
 export const runtime = 'edge';
@@ -26,7 +27,7 @@ const ratelimit = {
 const EMPTY_PROMPT_TEXT = 'empty_prompt';
 const LIMIT_REACHED_TEXT = 'limit_reached';
 export async function POST(request: Request) {
-  const { token, messages, tone, length } = await request.json();
+  const { token, messages, tone, length, hashtag } = await request.json();
   try {
     if (!messages[0].content) throw new Error(EMPTY_PROMPT_TEXT);
     const verified = await jwtVerify(
@@ -45,7 +46,11 @@ export async function POST(request: Request) {
         : tone === 'medium'
         ? 'more than 400 characters less than 600'
         : 'more than 700 characters less than 1000'
-    } characters, has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}.`;
+    } characters, has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}. There should only be ${pluralize(
+      'hastag',
+      Number(hashtag),
+      true,
+    )}`;
 
     await sql`INSERT INTO Prompts (Prompt) VALUES (${originalPrompt});`;
 

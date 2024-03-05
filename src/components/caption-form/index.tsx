@@ -1,8 +1,8 @@
 'use client';
 import { useRef } from 'react';
 
-import type { TLengths, TTones } from '@/constants';
-import { LENGTHS, TONES } from '@/constants';
+import type { THashtags, TLengths, TTones } from '@/constants';
+import { HASHTAGS, LENGTHS, TONES } from '@/constants';
 import { useChat } from 'ai/react';
 import { toast } from 'sonner';
 
@@ -18,24 +18,28 @@ type TCaptionFormProps = {
 
 const getTone = (
   searchParams: Record<string, string | undefined>,
-): { tone: TTones; length: TLengths } => {
-  const { tone, length } = searchParams;
+): { tone: TTones; length: TLengths; hashtag: THashtags } => {
+  const { tone, length, hashtags } = searchParams;
   let newTone = tone as TTones;
   let newLength = length as TLengths;
+  let newHashtag = hashtags as THashtags;
   if (!tone || !TONES.includes(tone as TTones)) {
     newTone = 'humerous';
   }
   if (!length || !LENGTHS.includes(length as TLengths)) {
     newLength = 'short';
   }
-  return { tone: newTone, length: newLength };
+  if (!hashtags || !HASHTAGS.includes(hashtags as THashtags)) {
+    newHashtag = '0';
+  }
+  return { tone: newTone, length: newLength, hashtag: newHashtag };
 };
 const CaptionForm = ({
   token,
   revalidate,
   searchParams,
 }: TCaptionFormProps) => {
-  const { tone, length } = getTone(searchParams);
+  const { tone, length, hashtag } = getTone(searchParams);
 
   const submitRef = useRef<React.ElementRef<'button'>>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -48,7 +52,7 @@ const CaptionForm = ({
     setInput,
   } = useChat({
     api: 'api/add-prompt',
-    body: { token, tone, length },
+    body: { token, tone, length, hashtag },
     onError: (error) => {
       setInput(input);
       toast.error(JSON.parse(error.message));
@@ -81,7 +85,7 @@ const CaptionForm = ({
 
         <SubmitButton isLoading={isLoading} ref={submitRef} />
       </form>
-      <MoreSettings length={length} tone={tone} />
+      <MoreSettings length={length} tone={tone} hashtag={hashtag} />
       <AiResponse messages={messages} />
     </>
   );
