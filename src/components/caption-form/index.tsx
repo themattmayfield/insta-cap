@@ -1,10 +1,9 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
-import { TONES } from '@/constants';
-import { createUrl } from '@/lib/utils';
+import type { TLengths, TTones } from '@/constants';
+import { LENGTHS, TONES } from '@/constants';
 import { useChat } from 'ai/react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import AiResponse from '../aiResponse';
@@ -17,43 +16,45 @@ type TCaptionFormProps = {
   searchParams: Record<string, string | undefined>;
 };
 
+const getTone = (
+  searchParams: Record<string, string | undefined>,
+): { tone: TTones; length: TLengths } => {
+  const { tone, length } = searchParams;
+  let newTone = tone as TTones;
+  let newLength = length as TLengths;
+  if (!tone || !TONES.includes(tone as TTones)) {
+    newTone = 'humerous';
+  }
+  if (!length || !LENGTHS.includes(length as TLengths)) {
+    newLength = 'short';
+  }
+  return { tone: newTone, length: newLength };
+};
 const CaptionForm = ({
   token,
   revalidate,
   searchParams,
 }: TCaptionFormProps) => {
-  const tone = searchParams.tone as string;
+  const { tone, length } = getTone(searchParams);
 
   const submitRef = useRef<React.ElementRef<'button'>>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const { push } = useRouter();
   const {
     messages,
     input,
     handleInputChange,
     handleSubmit,
     isLoading,
-    error,
     setInput,
   } = useChat({
     api: 'api/add-prompt',
-    body: { token, tone },
-    onError: () => {
+    body: { token, tone, length },
+    onError: (error) => {
       setInput(input);
+      toast.error(JSON.parse(error.message));
     },
     onFinish: async () => await revalidate(),
   });
-
-  useEffect(() => {
-    if (error) toast.error(JSON.parse(error.message));
-  }, [error]);
-  useEffect(() => {
-    if (!tone || !TONES.includes(tone)) {
-      const newParams = new URLSearchParams();
-      newParams.set('tone', 'humerous');
-      push(createUrl('/', newParams));
-    }
-  }, [push, searchParams, tone]);
 
   return (
     <>
@@ -80,7 +81,7 @@ const CaptionForm = ({
 
         <SubmitButton isLoading={isLoading} ref={submitRef} />
       </form>
-      <MoreSettings searchParams={searchParams} />
+      <MoreSettings length={length} tone={tone} />
       <AiResponse messages={messages} />
     </>
   );

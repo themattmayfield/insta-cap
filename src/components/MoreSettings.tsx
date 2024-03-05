@@ -16,18 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TONES } from '@/constants';
+import type { TLengths, TTones } from '@/constants';
+import { LENGTHS, TONES } from '@/constants';
 import { createUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const MoreSettings = ({
-  searchParams,
-}: {
-  searchParams: Record<string, string | undefined>;
-}) => {
-  const tone = searchParams.tone;
-  const { push } = useRouter();
+type TSettings = { tone: TTones; length: TLengths };
+
+const MoreSettings = ({ tone, length }: TSettings) => {
   return (
     <div className="flex space-x-2 mb-6">
       <Drawer>
@@ -40,31 +37,8 @@ const MoreSettings = ({
             <DrawerTitle>dial in your caption</DrawerTitle>
             <DrawerDescription>side note...buy me a coffee</DrawerDescription>
           </DrawerHeader>
-          <div className="grid grid-cols-3 items-center mb-4">
-            <Label className="mb-1" htmlFor="tone">
-              select a tone
-            </Label>
-            <Select
-              name="tone"
-              onValueChange={(e) => {
-                const newParams = new URLSearchParams();
-                newParams.set('tone', e);
-                push(createUrl('/', newParams));
-              }}
-              defaultValue={tone || 'funny'}
-            >
-              <SelectTrigger className="col-span-2">
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                {TONES.map((tone, index) => (
-                  <SelectItem key={index} value={tone}>
-                    {tone}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <ToneSelect length={length} tone={tone} />
+          <LengthSelect length={length} tone={tone} />
           <DrawerFooter>
             <div className="flex items-center justify-center space-x-4 animate-bounce">
               <Link href={'https://github.com/themattmayfield/insta-cap'}>
@@ -78,12 +52,75 @@ const MoreSettings = ({
         </DrawerContent>
       </Drawer>
       <Badge variant="outline">{tone}</Badge>
+      <Badge variant="outline">{length}</Badge>
     </div>
   );
 };
 
 export default MoreSettings;
 
+const ToneSelect = ({ tone, length }: TSettings) => {
+  const { push } = useRouter();
+
+  return (
+    <div className="grid grid-cols-3 items-center mb-4">
+      <Label className="mb-1" htmlFor="tone">
+        select a tone
+      </Label>
+      <Select
+        name="tone"
+        onValueChange={(e) => {
+          const newParams = new URLSearchParams({ tone, length });
+          newParams.set('tone', e);
+          push(createUrl('/', newParams));
+        }}
+        defaultValue={tone || 'funny'}
+      >
+        <SelectTrigger className="col-span-2">
+          <SelectValue placeholder="Theme" />
+        </SelectTrigger>
+        <SelectContent>
+          {TONES.map((tone, index) => (
+            <SelectItem key={index} value={tone}>
+              {tone}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+const LengthSelect = ({ length, tone }: TSettings) => {
+  const { push } = useRouter();
+
+  return (
+    <div className="grid grid-cols-3 items-center mb-4">
+      <Label className="mb-1" htmlFor="tone">
+        select a length
+      </Label>
+      <Select
+        name="tone"
+        onValueChange={(e) => {
+          const newParams = new URLSearchParams({ tone, length });
+          newParams.set('length', e);
+          push(createUrl('/', newParams));
+        }}
+        defaultValue={length || 'short'}
+      >
+        <SelectTrigger className="col-span-2">
+          <SelectValue placeholder="Theme" />
+        </SelectTrigger>
+        <SelectContent>
+          {LENGTHS.map((length, index) => (
+            <SelectItem key={index} value={length}>
+              {length}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
 const CogIcon = (props: { className: string }) => (
   <svg
     {...props}

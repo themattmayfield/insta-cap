@@ -26,7 +26,7 @@ const ratelimit = {
 const EMPTY_PROMPT_TEXT = 'empty_prompt';
 const LIMIT_REACHED_TEXT = 'limit_reached';
 export async function POST(request: Request) {
-  const { token, messages, tone } = await request.json();
+  const { token, messages, tone, length } = await request.json();
   try {
     if (!messages[0].content) throw new Error(EMPTY_PROMPT_TEXT);
     const verified = await jwtVerify(
@@ -39,7 +39,13 @@ export async function POST(request: Request) {
     if (remaining <= 0) throw new Error(LIMIT_REACHED_TEXT);
 
     const originalPrompt = messages[0].content;
-    const prompt = `Generate 3 ${tone} instagram captions clearly labeled "1.", "2.", and "3.". Only return these 3 instagram captionsy, nothing else. Make sure there are no quotation marks for each caption. Make sure each generated caption is less than 300 characters, has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}. Seperate responses by a two returns`;
+    const prompt = `Generate 3 ${tone} instagram captions clearly labeled "1.", "2.", and "3.". Do not number them. Only return these 3 instagram captions, nothing else. Make sure there are no quotation marks for each caption. Make sure each generated caption is ${
+      length === 'short'
+        ? 'less than 300'
+        : tone === 'medium'
+        ? 'more than 400 characters less than 600'
+        : 'more than 700 characters less than 1000'
+    } characters, has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}.`;
 
     await sql`INSERT INTO Prompts (Prompt) VALUES (${originalPrompt});`;
 

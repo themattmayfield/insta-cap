@@ -9,4 +9,8 @@ export const TONES = [
   'positive',
   'quirky',
   'empowering',
-];
+] as const;
+export type TTones = (typeof TONES)[number];
+
+export const LENGTHS = ['short', 'medium', 'long'] as const;
+export type TLengths = (typeof LENGTHS)[number];
