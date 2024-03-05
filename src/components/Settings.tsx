@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import type { THashtags, TLengths, TTones } from '@/constants';
+import { Switch } from '@/components/ui/switch';
+import type { TEmojis, THashtags, TLengths, TTones } from '@/constants';
 import { HASHTAGS, LENGTHS, TONES } from '@/constants';
 import { cn, createUrl } from '@/lib/utils';
 import Link from 'next/link';
@@ -27,9 +28,14 @@ import pluralize from 'pluralize';
 import { Button } from './ui/button';
 import { CogIcon, GithubIcon, InstagramIcon } from './ui/icons';
 
-type TSettings = { tone: TTones; length: TLengths; hashtag: THashtags };
+type TSettings = {
+  tone: TTones;
+  length: TLengths;
+  hashtag: THashtags;
+  emoji: TEmojis;
+};
 
-const MoreSettings = ({ tone, length, hashtag }: TSettings) => {
+const Settings = (props: TSettings) => {
   return (
     <div className="flex space-x-2 mb-6">
       <Drawer>
@@ -42,9 +48,10 @@ const MoreSettings = ({ tone, length, hashtag }: TSettings) => {
             <DrawerTitle>dial in your caption</DrawerTitle>
             <DrawerDescription>side note...buy me a coffee</DrawerDescription>
           </DrawerHeader>
-          <ToneSelect length={length} tone={tone} hashtag={hashtag} />
-          <LengthSelect length={length} tone={tone} hashtag={hashtag} />
-          <HashtagCountSlider length={length} tone={tone} hashtag={hashtag} />
+          <ToneSelect {...props} />
+          <LengthSelect {...props} />
+          <HashtagCountSlider {...props} />
+          <EmojiSwitch {...props} />
 
           <DrawerFooter>
             <div className="flex items-center justify-center space-x-4 animate-bounce">
@@ -58,20 +65,20 @@ const MoreSettings = ({ tone, length, hashtag }: TSettings) => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-      <Badge variant="outline">{tone}</Badge>
-      <Badge variant="outline">{length}</Badge>
+      <Badge variant="outline">{props.tone}</Badge>
+      <Badge variant="outline">{props.length}</Badge>
       <Badge variant="outline">
-        {hashtag === '0'
+        {props.hashtag === '0'
           ? 'no hashtags'
-          : pluralize('hashtags', Number(hashtag), true)}
+          : pluralize('hashtags', Number(props.hashtag), true)}
       </Badge>
     </div>
   );
 };
 
-export default MoreSettings;
+export default Settings;
 
-const ToneSelect = ({ tone, length, hashtag }: TSettings) => {
+const ToneSelect = ({ tone, length, hashtag, emoji }: TSettings) => {
   const { push } = useRouter();
 
   return (
@@ -82,7 +89,12 @@ const ToneSelect = ({ tone, length, hashtag }: TSettings) => {
       <Select
         name="tone"
         onValueChange={(e) => {
-          const newParams = new URLSearchParams({ tone, length, hashtag });
+          const newParams = new URLSearchParams({
+            tone,
+            length,
+            hashtag,
+            emoji,
+          });
           newParams.set('tone', e);
           push(createUrl('/', newParams));
         }}
@@ -102,7 +114,7 @@ const ToneSelect = ({ tone, length, hashtag }: TSettings) => {
     </div>
   );
 };
-const LengthSelect = ({ length, tone, hashtag }: TSettings) => {
+const LengthSelect = ({ length, tone, hashtag, emoji }: TSettings) => {
   const { push } = useRouter();
 
   return (
@@ -127,6 +139,7 @@ const LengthSelect = ({ length, tone, hashtag }: TSettings) => {
                   tone,
                   length,
                   hashtag,
+                  emoji,
                 });
                 newParams.set('length', currentLength);
                 push(createUrl('/', newParams));
@@ -142,7 +155,7 @@ const LengthSelect = ({ length, tone, hashtag }: TSettings) => {
   );
 };
 
-const HashtagCountSlider = ({ tone, length, hashtag }: TSettings) => {
+const HashtagCountSlider = ({ tone, length, hashtag, emoji }: TSettings) => {
   const { push } = useRouter();
 
   return (
@@ -152,7 +165,12 @@ const HashtagCountSlider = ({ tone, length, hashtag }: TSettings) => {
       </Label>
       <Slider
         onValueChange={([val]) => {
-          const newParams = new URLSearchParams({ tone, length, hashtag });
+          const newParams = new URLSearchParams({
+            tone,
+            length,
+            hashtag,
+            emoji,
+          });
           newParams.set('hashtag', val.toString());
           push(createUrl('/', newParams));
         }}
@@ -188,5 +206,30 @@ const LengthButton = ({
     >
       {name}
     </Button>
+  );
+};
+
+const EmojiSwitch = ({ tone, length, hashtag, emoji }: TSettings) => {
+  const { push } = useRouter();
+
+  return (
+    <div className="grid grid-cols-3 items-center mb-4">
+      <Label className="mb-1" htmlFor="tone">
+        with emojis
+      </Label>
+      <Switch
+        defaultChecked={emoji === 'true'}
+        onCheckedChange={(val) => {
+          const newParams = new URLSearchParams({
+            tone,
+            length,
+            hashtag,
+            emoji,
+          });
+          newParams.set('emoji', val.toString());
+          push(createUrl('/', newParams));
+        }}
+      />
+    </div>
   );
 };

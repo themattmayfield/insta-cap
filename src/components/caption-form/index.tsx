@@ -1,13 +1,13 @@
 'use client';
 import { useRef } from 'react';
 
-import type { THashtags, TLengths, TTones } from '@/constants';
-import { HASHTAGS, LENGTHS, TONES } from '@/constants';
+import type { TEmojis, THashtags, TLengths, TTones } from '@/constants';
+import { EMOJIS, HASHTAGS, LENGTHS, TONES } from '@/constants';
 import { useChat } from 'ai/react';
 import { toast } from 'sonner';
 
 import AiResponse from '../aiResponse';
-import MoreSettings from '../MoreSettings';
+import Settings from '../Settings';
 
 import { SubmitButton } from './SubmitButton';
 type TCaptionFormProps = {
@@ -18,11 +18,12 @@ type TCaptionFormProps = {
 
 const getTone = (
   searchParams: Record<string, string | undefined>,
-): { tone: TTones; length: TLengths; hashtag: THashtags } => {
-  const { tone, length, hashtag } = searchParams;
+): { tone: TTones; length: TLengths; hashtag: THashtags; emoji: TEmojis } => {
+  const { tone, length, hashtag, emoji } = searchParams;
   let newTone = tone as TTones;
   let newLength = length as TLengths;
   let newHashtag = hashtag as THashtags;
+  let newEmoji = emoji as TEmojis;
   if (!tone || !TONES.includes(tone as TTones)) {
     newTone = 'humerous';
   }
@@ -32,14 +33,22 @@ const getTone = (
   if (!hashtag || !HASHTAGS.includes(hashtag as THashtags)) {
     newHashtag = '0';
   }
-  return { tone: newTone, length: newLength, hashtag: newHashtag };
+  if (!emoji || !EMOJIS.includes(emoji as TEmojis)) {
+    newEmoji = 'false';
+  }
+  return {
+    tone: newTone,
+    length: newLength,
+    hashtag: newHashtag,
+    emoji: newEmoji,
+  };
 };
 const CaptionForm = ({
   token,
   revalidate,
   searchParams,
 }: TCaptionFormProps) => {
-  const { tone, length, hashtag } = getTone(searchParams);
+  const { tone, length, hashtag, emoji } = getTone(searchParams);
 
   const submitRef = useRef<React.ElementRef<'button'>>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -52,7 +61,7 @@ const CaptionForm = ({
     setInput,
   } = useChat({
     api: 'api/add-prompt',
-    body: { token, tone, length, hashtag },
+    body: { token, tone, length, hashtag, emoji },
     onError: (error) => {
       setInput(input);
       toast.error(JSON.parse(error.message));
@@ -85,7 +94,7 @@ const CaptionForm = ({
 
         <SubmitButton isLoading={isLoading} ref={submitRef} />
       </form>
-      <MoreSettings length={length} tone={tone} hashtag={hashtag} />
+      <Settings length={length} tone={tone} hashtag={hashtag} emoji={emoji} />
       <AiResponse messages={messages} />
     </>
   );

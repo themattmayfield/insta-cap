@@ -29,7 +29,8 @@ const ratelimit = {
 const EMPTY_PROMPT_TEXT = 'empty_prompt';
 const LIMIT_REACHED_TEXT = 'limit_reached';
 export async function POST(request: Request) {
-  const { token, messages, tone, length, hashtag } = await request.json();
+  const { token, messages, tone, length, hashtag, emoji } =
+    await request.json();
   try {
     if (!messages[0].content) throw new Error(EMPTY_PROMPT_TEXT);
     const verified = await jwtVerify(
@@ -50,11 +51,19 @@ export async function POST(request: Request) {
         ? 'more than 400 characters less than 600'
         : 'more than 700 characters less than 1000'
     }`;
+    const emojiText =
+      emoji === 'true'
+        ? 'Use emojis but not a lot at all'
+        : 'Absolutely do not use emojis';
     const prompt = `${toneText} instagram captions clearly labeled "1.", "2.", and "3.". 
     Only return these 3 instagram captions, nothing else. Make sure there are no quotation 
     marks for each caption. Make sure each generated caption is ${lengthText} characters, 
     has short sentences that are found in instagram bios, and feel free to use this context as well: ${originalPrompt}. 
-    There should be exactly ${pluralize('hashtag', Number(hashtag), true)}`;
+    There should be exactly ${pluralize(
+      'hashtag',
+      Number(hashtag),
+      true,
+    )}. ${emojiText}`;
 
     await sql`INSERT INTO Prompts (Prompt) VALUES (${originalPrompt});`;
 
